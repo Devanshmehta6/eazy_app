@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:eazy_app/Services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eazy_app/Pages/login_page.dart';
@@ -14,6 +15,8 @@ class EazyApp extends StatelessWidget {
   clearData() async {
     final pref = await SharedPreferences.getInstance();
     pref.clear();
+    final token = pref.getString('token');
+    print(token);
   }
 
 

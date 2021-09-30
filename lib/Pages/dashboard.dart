@@ -6,8 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_session/flutter_session.dart';
 import 'package:http/http.dart' as http;
-import 'package:eazy_app/Services/DashboardJson.dart';
 import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -68,6 +68,11 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        kToolbarHeight;
+    final width = MediaQuery.of(context).size.width;
+    const color = const Color(0x4044fc);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -78,31 +83,20 @@ class _DashboardState extends State<Dashboard> {
           backgroundColor: Colors.white,
           title: Row(
             children: <Widget>[
+              //SizedBox(width: width * 0.7),
               Image.asset(
                 'images/eazyapp-logo-blue.png',
                 height: 48,
                 width: 40,
               ),
-              SizedBox(width: 63),
+              SizedBox(width: width * 0.22),
               Text(
-                'Welcome',
+                'EazyDashboard',
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
-                      color: Colors.blue.shade800,
+                      color: Colors.blue,
                       fontSize: 16,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              SizedBox(width: 3),
-              mapResponse == null ? Container() : 
-              Text(
-                mapResponse['Name'].toString(),
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.green,
-                  ),
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -111,33 +105,13 @@ class _DashboardState extends State<Dashboard> {
         body: Container(
           child: Column(
             children: <Widget>[
-              Container(
-                height: 60,
-                child: Card(
-                  color: Colors.lightBlue.shade50,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 25),
-                      ),
-                      Text(
-                        'Dashboard',
-                        style: GoogleFonts.poppins(
-                          textStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              SizedBox(height: height * 0.05),
               Total(context),
+              SizedBox(height: height * 0.03),
               Direct(context),
+              SizedBox(height: height * 0.03),
               CP(context),
+              SizedBox(height: height * 0.03),
             ],
           ),
         ),
@@ -153,9 +127,8 @@ class _DashboardState extends State<Dashboard> {
     //sabKuch();
     return Column(
       children: <Widget>[
-        SizedBox(height: 20),
         Container(
-          height: height * 0.25,
+          height: height * 0.28,
           width: width,
           color: Colors.red.shade400,
           margin: EdgeInsets.only(left: 10, right: 10),
@@ -167,41 +140,44 @@ class _DashboardState extends State<Dashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Total Walkins - CP',
+                    'Total Visits - CP',
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 5),
+                  SizedBox(height: height * 0.01),
                   Text(
                     DateFormat("dd-MM-yyyy").format(
                       DateTime.now(),
                     ),
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   //SizedBox(width : 50),
-                  mapResponse == null ? Container() : 
-                  Text(
-                    mapResponse['cp_customers'].toString(),
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 40,
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: height * 0.02),
+                  mapResponse == null
+                      ? Container()
+                      : Text(
+                          mapResponse['cp_customers']
+                              .toString(), //"$total_customers",
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              fontSize: 50,
+                            ),
+                          ),
+                        ),
                 ],
               ),
-              SizedBox(width: 38),
+              SizedBox(width: width * 0.12),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
-                margin: EdgeInsets.only(bottom: 20),
-                child: Icon(Icons.person_sharp, size: 110),
+                margin: EdgeInsets.only(bottom: 25),
+                child: Icon(FontAwesomeIcons.userTie , size : 120,),
               ),
             ],
           ),
@@ -218,11 +194,10 @@ class _DashboardState extends State<Dashboard> {
     //sabKuch();
     return Column(
       children: <Widget>[
-        SizedBox(height: 25),
         Container(
-          height: height * 0.25,
+          height: height * 0.28,
           width: width,
-          color: Colors.green.shade300,
+          color: Colors.green.shade400,
           margin: EdgeInsets.only(left: 10, right: 10),
           padding: EdgeInsets.only(left: 20, top: 15),
           child: Row(
@@ -232,41 +207,46 @@ class _DashboardState extends State<Dashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Total Walkins - Direct',
+                    'Total Visits - Direct',
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 5),
+                  SizedBox(height: height * 0.01),
                   Text(
                     DateFormat("dd-MM-yyyy").format(
                       DateTime.now(),
                     ),
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   //SizedBox(width : 50),
-                  mapResponse == null ? Container() : 
-                  Text(
-                    mapResponse['direct_customers'].toString(), //'$direct_customers',
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 40,
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: height * 0.02),
+                  mapResponse == null
+                      ? Container()
+                      : Text(
+                          mapResponse['direct_customers']
+                              .toString(), //"$total_customers",
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              fontSize: 50,
+                            ),
+                          ),
+                        ),
                 ],
               ),
-              SizedBox(width: 8),
+              SizedBox(width: width * 0.025),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
-                margin: EdgeInsets.only(bottom: 20),
-                child: Icon(Icons.person_sharp, size: 110),
+                margin: EdgeInsets.only(bottom: 25),
+                child: Icon(FontAwesomeIcons.solidUser , size: 120 ,
+                  
+                 ),
               ),
             ],
           ),
@@ -283,9 +263,8 @@ class _DashboardState extends State<Dashboard> {
     //sabKuch();
     return Column(
       children: <Widget>[
-        SizedBox(height: 20),
         Container(
-          height: height * 0.25,
+          height: height * 0.28,
           width: width,
           color: Colors.blue.shade300,
           margin: EdgeInsets.only(left: 10, right: 10),
@@ -299,39 +278,42 @@ class _DashboardState extends State<Dashboard> {
                   Text(
                     'Total Visits',
                     style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 5),
+                  SizedBox(height: height * 0.01),
                   Text(
                     DateFormat("dd-MM-yyyy").format(
                       DateTime.now(),
                     ),
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   //SizedBox(width : 50),
-                  mapResponse == null ? Container() : 
-                  Text(
-                    mapResponse['total_customers'].toString(), //"$total_customers",
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 40,
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: height * 0.02),
+                  mapResponse == null
+                      ? Container()
+                      : Text(
+                          mapResponse['total_customers']
+                              .toString(), //"$total_customers",
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              fontSize: 50,
+                            ),
+                          ),
+                        ),
                 ],
               ),
-              SizedBox(width: 110),
+              SizedBox(width: width * 0.16),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
-                margin: EdgeInsets.only(bottom: 20),
-                child: Icon(Icons.people_alt_sharp, size: 100),
+                margin: EdgeInsets.only(bottom: 25 ),
+                child: Icon(FontAwesomeIcons.users, size: 120),
               ),
             ],
           ),

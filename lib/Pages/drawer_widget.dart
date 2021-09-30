@@ -54,14 +54,15 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             SizedBox(height: 15),
             buildMenuItem(
               text: 'Log Out',
-              onClicked:() async {
+              onClicked: () async {
                 SharedPreferences pref = await SharedPreferences.getInstance();
                 await pref.clear();
-                 Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginPage(),
-                          ),);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
                 bool isLogged = pref.getBool('log');
                 print('IS USER LOGGED IN AFTER LOGOUT PAGE ::::: $isLogged');
               },
@@ -122,7 +123,7 @@ class _ProjectState extends State<Project> {
           ),
           children: [
             Container(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.only(left: 50),
               child: Row(
                 children: <Widget>[
                   Image.asset('images/bullet.jpg', height: 15, width: 15),
@@ -162,86 +163,17 @@ class _ProjectState extends State<Project> {
 }
 
 class ProjectTeams extends StatefulWidget {
-  // getToken() async {
-  //   final pref = await SharedPreferences.getInstance();
-  //   final data = pref.getString('token');
-  //   return data;
-  // }
-
-  // getData() async {
-  //   Map<String, String> headers = {
-
-  //     HttpHeaders.contentTypeHeader: 'application/json',
-  //     HttpHeaders.acceptHeader: 'application/json',
-  //     HttpHeaders.authorizationHeader: await getToken(),
-  //   };
-
-  //   final url = Uri.parse(
-  //       'https://geteazyapp.com/eazyteams/urbanplace-project-by-urbanplace-210720084736-210720090839/api');
-
-  //   final response = await http.get(url, headers: headers);
-  //   print(response.body.toString());
-  // }
-
   @override
   State<ProjectTeams> createState() => _ProjectTeamsState();
 }
 
 class _ProjectTeamsState extends State<ProjectTeams> {
-  Future getData() async {
-
-
-    final pref = await SharedPreferences.getInstance();
-    
-    final isLoggedIn = pref.getBool('log');
-    if(isLoggedIn==true){
-    Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
-    print(" ================== $url");
-    String sessionId = await FlutterSession().get('session') ;
-    print(" ================== $sessionId");
-    String csrf = await FlutterSession().get('csrf') ;
-    print(" ================== $csrf");
-    final sp = await SharedPreferences.getInstance();
-    String? authorization = sp.getString('token');
-    String? tokenn = authorization;
-    final cookie = sp.getString('cookie');
-    print('Drawer widget : $csrf');
-    final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
-    http.Response response = await http.get(url, headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      HttpHeaders.authorizationHeader: tokenn,
-      HttpHeaders.cookieHeader : setcookie,      
-     
-    });
-    
-    print(response.body);
-    
-    
-
-    }else {
-      print('Logged out ');
-    }
-    //var responseBody = jsonDecode(response.body);
-
-    
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    //getData();
-  }
-
   @override
   Widget build(BuildContext context) {
-    //sabKuch();
-
     final theme = Theme.of(context).copyWith(dividerColor: Colors.transparent);
     final color = Colors.blue.shade800;
     final fontFamily = 'Poppins';
-    final fontSize = 16.0;
+    //final fontSize = 16.0;
     final fontWeight = FontWeight.w500;
     return Container(
       child: Theme(
@@ -253,7 +185,7 @@ class _ProjectTeamsState extends State<ProjectTeams> {
               style: TextStyle(
                 color: color,
                 fontFamily: fontFamily,
-                fontSize: fontSize,
+                fontSize: 16,
               ),
             ),
             children: [
@@ -276,7 +208,7 @@ class _ProjectTeamsState extends State<ProjectTeams> {
                         'UrbanPlace Project',
                         style: TextStyle(
                             color: color,
-                            fontSize: 20,
+                            fontSize: 16,
                             fontFamily: fontFamily,
                             fontWeight: fontWeight),
                       ),
@@ -307,7 +239,6 @@ void selectedItem(BuildContext context, int index) {
         ),
       );
       break;
-    
   }
 }
 

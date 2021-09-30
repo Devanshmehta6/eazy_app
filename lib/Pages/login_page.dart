@@ -34,42 +34,7 @@ class LoginPageState extends State<LoginPage> {
 
     bool isLoggedIn = false;
 
-    // callLoginApi() {
-    //   final service = ApiServices();
-    //   service.apiCallLogin(
-    //     {
-    //       "username": emailController.text,
-    //       "password": passController.text,
-    //     },
-    //   ).then((value) async {
-    //     if (value.error != null) {
-    //       ScaffoldMessenger.of(context)
-    //           .showSnackBar(SnackBar(content: Text('Invalid credentials')));
-    //       print("get data >>>>> " + value.error!);
-    //     } else {
-    //       print(value.token!);         //PRINTS THE TOKEN IN THE CONSOLE
-
-    //         String sessionId = await FlutterSession().get('session') ;
-    //        print('Session id from tc ::::: $sessionId');
-    //        setState(() {
-    //          isLoggedIn = true;
-
-    //        });
-    //       final pref = await SharedPreferences.getInstance();
-    //       pref.setBool('isLoggedIn', isLoggedIn);
-    //       Navigator.push(
-    //         context,
-    //         MaterialPageRoute(builder: (context) => Dashboard()),
-    //        );
-    //     }
-    //   });
-    // }
-
-    // getData() async {
-    //   final pref = await SharedPreferences.getInstance();
-    //   final data = pref.getString('token');
-    //   print('yE : $data');
-    // }
+    
 
     var authInfo;
     dynamic login(BuildContext context) async  {
@@ -109,20 +74,7 @@ class LoginPageState extends State<LoginPage> {
       }
     }
 
-    // Future<void> loginApi() async {
-    //   if (passController.text.isNotEmpty && emailController.text.isNotEmpty) {
-    //     var response = await http.post(
-    //       Uri.parse("https://geteazyapp.com/api/login"),
-    //       body: ({
-    //         'username ': emailController.text,
-    //         'password': passController.text
-    //       }),
-    //     );
-    //     if(response.statusCode==200){
-    //       Navigator.push(context , )
-    //     }
-    //   }
-    // }
+    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -132,8 +84,15 @@ class LoginPageState extends State<LoginPage> {
           child: Container(
             child: Column(
               children: <Widget>[
+
                 Container(
-                  padding: EdgeInsets.only(top: 200, right: 165),
+                 // margin : EdgeInsets.only(top :150 , right : 230) ,
+                  padding: EdgeInsets.only(top: 150, right: 230),
+                  child : Image.asset('images/eazyapp-logo-blue.png' , height : height * 0.1)
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 50, right: 140),                
+                  // color: Colors.red,
                   child: Text(
                     'Welcome back!',
                     style: GoogleFonts.poppins(
@@ -146,7 +105,7 @@ class LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: height * 0.001),
                 Container(
-                  padding: EdgeInsets.only(right: 140),
+                  margin: EdgeInsets.only(top: 2, right: 138),
                   child: Text(
                     'Please Login to continue',
                     style: GoogleFonts.poppins(
@@ -157,8 +116,8 @@ class LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 140, left: 8, right: 8),
+                Container(
+                  margin: EdgeInsets.only(top: 50, left: 18, right: 18),
                   child: Column(
                     children: <Widget>[
                       Container(
@@ -233,7 +192,7 @@ class LoginPageState extends State<LoginPage> {
                             ),
                             SizedBox(height: height * 0.001),
                             Container(
-                              padding: EdgeInsets.only(left: 210),
+                              margin: EdgeInsets.only(left: 190),
                               child: OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   side:
@@ -260,7 +219,7 @@ class LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                               height: height * 0.05,
-                              width: width - 0.02,
+                              width: width * 0.87,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     primary: Colors.blue.shade800),
