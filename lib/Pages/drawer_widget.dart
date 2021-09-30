@@ -54,7 +54,17 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             SizedBox(height: 15),
             buildMenuItem(
               text: 'Log Out',
-              onClicked: () => selectedItem(context, 1),
+              onClicked:() async {
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                await pref.clear();
+                 Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),);
+                bool isLogged = pref.getBool('log');
+                print('IS USER LOGGED IN AFTER LOGOUT PAGE ::::: $isLogged');
+              },
             ),
           ],
         ),
@@ -297,13 +307,7 @@ void selectedItem(BuildContext context, int index) {
         ),
       );
       break;
-    case 1:
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => LoginPage(),
-        ),
-      );
-      break;
+    
   }
 }
 

@@ -3,14 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:eazy_app/Pages/login_page.dart';
 
 import 'Pages/dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(EazyApp());
 }
 
 class EazyApp extends StatelessWidget {
+
+  clearData() async {
+    final pref = await SharedPreferences.getInstance();
+    pref.clear();
+  }
+
+
   @override
-  
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -21,7 +28,9 @@ class EazyApp extends StatelessWidget {
             return CircularProgressIndicator();
           }
           else if (snapshot.hasData){
-            return Dashboard();
+            clearData();
+            return LoginPage();
+            
           }
           else {
             return LoginPage();

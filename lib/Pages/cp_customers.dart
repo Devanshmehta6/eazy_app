@@ -11,35 +11,8 @@ class CP extends StatefulWidget {
 }
 
 class _CPState extends State<CP> {
-  // Map<String, dynamic> data = {};
-  // String mockData = '', cp_customers = '';
-  // Future<String?> postData() async {
-  //   final url = Uri.parse('https://geteazyapp.com/dashboard_api/');
-  //   final sp = await SharedPreferences.getInstance();
-  //   String? authorization = sp.getString('token');
-  //   http.Response response = await http.get(url, headers: {
-  //     'Accept': 'appilication/json',
-  //     'Authorization': authorization!
-  //   });
-  //   setState(() {
-  //     mockData = response.body.toString();
-  //   });
-  //   return null;
-  // }
-
-  // Future decodeData() async {
-  //   final Map<String, dynamic> parsedData = await json.decode(mockData);
-  //   //print(parsedData[0]['cp_customers']);
-  //   setState(() {
-  //     cp_customers = parsedData[0]['cp_customers'].toString();
-  //   });
-  // }
-
-  // Future sabKuch() async {
-  //   postData().whenComplete(() async {
-  //     await decodeData();
-  //   });
-  // }
+  
+  
 
   @override
   Widget build(BuildContext context) {

@@ -1,15 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:eazy_app/Pages/drawer_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:eazy_app/Pages/direct_customers.dart';
-import 'package:eazy_app/Pages/cp_customers.dart';
-import 'package:eazy_app/Pages/total_customers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_session/flutter_session.dart';
 import 'package:http/http.dart' as http;
+import 'package:eazy_app/Services/DashboardJson.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -19,13 +17,12 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  String total = '';
-  String map = '', total_customers = '';
-
+  Map mapResponse = {};
   Future getData() async {
     final pref = await SharedPreferences.getInstance();
 
     final isLoggedIn = pref.getBool('log');
+
     if (isLoggedIn == true) {
       Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
       print(" ================== $url");
@@ -45,34 +42,32 @@ class _DashboardState extends State<Dashboard> {
         HttpHeaders.authorizationHeader: tokenn,
         HttpHeaders.cookieHeader: setcookie,
       });
+      if (response.statusCode == 200) {
+        setState(() {
+          mapResponse = json.decode(response.body);
+        });
+      }
+      print('RESPONSE BODY : ${response.body}');
+      final entireJson = jsonDecode(response.body);
 
-      print(response.body);
+      //FetchData fetchData = FetchData.fromJson(entireJson);
+      //print(entireJson[0]['Name']);
+      //naam = entireJson[0]['Name'];
 
-      map = response.body.toString();
     } else {
       print('Logged out ');
     }
   }
 
-  Future decodeData() async {
-    final List<dynamic> parsedData = await json.decode(map);
-    
-      total_customers = parsedData[0]['Name'].toString();
-      print('yayayayay ::::::: $total_customers');
-    
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
   }
-
-  Future sabKuch() async {
-    getData().whenComplete(() async {
-      await decodeData();
-    });
-  }
-
- 
 
   @override
   Widget build(BuildContext context) {
-    sabKuch();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -90,7 +85,7 @@ class _DashboardState extends State<Dashboard> {
               ),
               SizedBox(width: 63),
               Text(
-                total_customers,
+                'Welcome',
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
                       color: Colors.blue.shade800,
@@ -99,8 +94,9 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
               SizedBox(width: 3),
+              mapResponse == null ? Container() : 
               Text(
-                'Visit Manager',
+                mapResponse['Name'].toString(),
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     fontSize: 16,
@@ -139,13 +135,208 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               ),
-              Total(),
-              Direct(),
-              CP(),
+              Total(context),
+              Direct(context),
+              CP(context),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget CP(BuildContext context) {
+    final height = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        kToolbarHeight;
+    final width = MediaQuery.of(context).size.width;
+    //sabKuch();
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 20),
+        Container(
+          height: height * 0.25,
+          width: width,
+          color: Colors.red.shade400,
+          margin: EdgeInsets.only(left: 10, right: 10),
+          padding: EdgeInsets.only(left: 20, top: 15),
+          child: Row(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Total Walkins - CP',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    DateFormat("dd-MM-yyyy").format(
+                      DateTime.now(),
+                    ),
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  //SizedBox(width : 50),
+                  mapResponse == null ? Container() : 
+                  Text(
+                    mapResponse['cp_customers'].toString(),
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 40,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 38),
+              Container(
+                // padding : EdgeInsets.only(bottom: 20),
+                margin: EdgeInsets.only(bottom: 20),
+                child: Icon(Icons.person_sharp, size: 110),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget Direct(BuildContext context) {
+    final height = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        kToolbarHeight;
+    final width = MediaQuery.of(context).size.width;
+    //sabKuch();
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 25),
+        Container(
+          height: height * 0.25,
+          width: width,
+          color: Colors.green.shade300,
+          margin: EdgeInsets.only(left: 10, right: 10),
+          padding: EdgeInsets.only(left: 20, top: 15),
+          child: Row(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Total Walkins - Direct',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    DateFormat("dd-MM-yyyy").format(
+                      DateTime.now(),
+                    ),
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  //SizedBox(width : 50),
+                  mapResponse == null ? Container() : 
+                  Text(
+                    mapResponse['direct_customers'].toString(), //'$direct_customers',
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 40,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 8),
+              Container(
+                // padding : EdgeInsets.only(bottom: 20),
+                margin: EdgeInsets.only(bottom: 20),
+                child: Icon(Icons.person_sharp, size: 110),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget Total(BuildContext context) {
+    final height = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).padding.top -
+        kToolbarHeight;
+    final width = MediaQuery.of(context).size.width;
+    //sabKuch();
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 20),
+        Container(
+          height: height * 0.25,
+          width: width,
+          color: Colors.blue.shade300,
+          margin: EdgeInsets.only(left: 10, right: 10),
+          padding: EdgeInsets.only(left: 20, top: 15),
+          child: Row(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Total Visits',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    DateFormat("dd-MM-yyyy").format(
+                      DateTime.now(),
+                    ),
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  //SizedBox(width : 50),
+                  mapResponse == null ? Container() : 
+                  Text(
+                    mapResponse['total_customers'].toString(), //"$total_customers",
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 40,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 110),
+              Container(
+                // padding : EdgeInsets.only(bottom: 20),
+                margin: EdgeInsets.only(bottom: 20),
+                child: Icon(Icons.people_alt_sharp, size: 100),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
