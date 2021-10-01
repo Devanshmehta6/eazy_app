@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_session/flutter_session.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:dio/dio.dart' as http;
 import 'package:eazy_app/Services/teams_json.dart';
@@ -21,6 +22,58 @@ class NavigationDrawerWidget extends StatefulWidget {
 
 class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   final padding = EdgeInsets.symmetric(horizontal: 10);
+  Color myColor = Color(0xff4044fc);
+
+  Map mapResponse = {};
+  Future getData() async {
+    final pref = await SharedPreferences.getInstance();
+
+    final isLoggedIn = pref.getBool('log');
+
+    if (isLoggedIn == true) {
+      Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
+      print(" ================== $url");
+      String sessionId = await FlutterSession().get('session');
+      print(" ================== $sessionId");
+      String csrf = await FlutterSession().get('csrf');
+      print(" ================== $csrf");
+      final sp = await SharedPreferences.getInstance();
+      String? authorization = sp.getString('token');
+      String? tokenn = authorization;
+      final cookie = sp.getString('cookie');
+      print('Drawer widget : $csrf');
+      final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
+      http.Response response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        HttpHeaders.authorizationHeader: tokenn,
+        HttpHeaders.cookieHeader: setcookie,
+      });
+      if (response.statusCode == 200) {
+        setState(() {
+          mapResponse = json.decode(response.body);
+        });
+      }
+      print('RESPONSE BODY : ${response.body}');
+      final entireJson = jsonDecode(response.body);
+
+      //FetchData fetchData = FetchData.fromJson(entireJson);
+      //print(entireJson[0]['Name']);
+      //naam = entireJson[0]['Name'];
+
+    } else {
+      print('Logged out ');
+    }
+  }
+
+  
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +93,11 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            
             buildMenuItem(
               text: 'EazyDashboard',
               onClicked: () => selectedItem(context, 0),
             ),
-            const SizedBox(height: 10),
             Project(),
             const SizedBox(height: 10),
             ProjectTeams(),
@@ -76,9 +128,10 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
 Widget buildMenuItem({
   required String text,
+  Color myColor = const Color(0xff4044fc),
   VoidCallback? onClicked,
 }) {
-  final color = Colors.blue.shade800;
+  final color = myColor;
   final fontFamily = 'Poppins';
   final fontSize = 16.0;
 
@@ -104,7 +157,8 @@ class _ProjectState extends State<Project> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).copyWith(dividerColor: Colors.transparent);
-    final color = Colors.blue.shade800;
+
+    final color = Color(0xff4044fc);
     final fontFamily = 'Poppins';
     final fontSize = 16.0;
     final fontWeight = FontWeight.w500;
@@ -171,7 +225,7 @@ class _ProjectTeamsState extends State<ProjectTeams> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).copyWith(dividerColor: Colors.transparent);
-    final color = Colors.blue.shade800;
+    final color = Color(0xff4044fc);
     final fontFamily = 'Poppins';
     //final fontSize = 16.0;
     final fontWeight = FontWeight.w500;
@@ -239,24 +293,5 @@ void selectedItem(BuildContext context, int index) {
         ),
       );
       break;
-  }
-}
-
-class UserDetails {
-  late String name;
-  late String username;
-
-  UserDetails({required this.name, required this.username});
-
-  UserDetails.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    username = json['role'];
-  }
-
-  String toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['username'] = this.username;
-    return data.toString();
   }
 }

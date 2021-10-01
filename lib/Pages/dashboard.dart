@@ -17,7 +17,9 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  Color myColor = Color(0xff4044fc);
   Map mapResponse = {};
+
   Future getData() async {
     final pref = await SharedPreferences.getInstance();
 
@@ -63,6 +65,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     getData();
   }
 
@@ -72,7 +75,7 @@ class _DashboardState extends State<Dashboard> {
         MediaQuery.of(context).padding.top -
         kToolbarHeight;
     final width = MediaQuery.of(context).size.width;
-    const color = const Color(0x4044fc);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -94,7 +97,7 @@ class _DashboardState extends State<Dashboard> {
                 'EazyDashboard',
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
-                      color: Colors.blue,
+                      color: myColor,
                       fontSize: 16,
                       fontWeight: FontWeight.w600),
                 ),
@@ -163,7 +166,7 @@ class _DashboardState extends State<Dashboard> {
                   mapResponse == null
                       ? Container()
                       : Text(
-                          mapResponse['cp_customers']
+                          mapResponse['dashboard_statistics']['cp_customers']
                               .toString(), //"$total_customers",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
@@ -177,7 +180,10 @@ class _DashboardState extends State<Dashboard> {
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
                 margin: EdgeInsets.only(bottom: 25),
-                child: Icon(FontAwesomeIcons.userTie , size : 120,),
+                child: Icon(
+                  FontAwesomeIcons.userTie,
+                  size: 120,
+                ),
               ),
             ],
           ),
@@ -230,7 +236,8 @@ class _DashboardState extends State<Dashboard> {
                   mapResponse == null
                       ? Container()
                       : Text(
-                          mapResponse['direct_customers']
+                          mapResponse['dashboard_statistics']
+                                  ['direct_customers']
                               .toString(), //"$total_customers",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
@@ -244,9 +251,11 @@ class _DashboardState extends State<Dashboard> {
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
                 margin: EdgeInsets.only(bottom: 25),
-                child: Icon(FontAwesomeIcons.solidUser , size: 120 ,
-                  
-                 ),
+                child: Icon(
+                  FontAwesomeIcons.solidUser,
+                  size: 120,
+                  color: Colors.green.shade100,
+                ),
               ),
             ],
           ),
@@ -296,10 +305,10 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   //SizedBox(width : 50),
                   SizedBox(height: height * 0.02),
-                  mapResponse == null
+                  mapResponse['dashboard_statistics']['total_customers'] == null
                       ? Container()
                       : Text(
-                          mapResponse['total_customers']
+                          mapResponse['dashboard_statistics']['total_customers']
                               .toString(), //"$total_customers",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
@@ -312,7 +321,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: width * 0.16),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
-                margin: EdgeInsets.only(bottom: 25 ),
+                margin: EdgeInsets.only(bottom: 25),
                 child: Icon(FontAwesomeIcons.users, size: 120),
               ),
             ],

@@ -20,6 +20,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
+  Color myColor = Color(0xff4044fc);
   bool isLoading = false;
   bool isHiddenPassword = true;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -34,16 +35,14 @@ class LoginPageState extends State<LoginPage> {
 
     bool isLoggedIn = false;
 
-    
-
     var authInfo;
-    dynamic login(BuildContext context) async  {
 
+    dynamic login(BuildContext context) async {
       authInfo = AuthService();
-      print("============== >>>> ${emailController.text} ");
-      print("============== >>>> ${passController.text} ");
-      final res = await authInfo.login(emailController.text , passController.text);
-      final data = jsonDecode(res.body) as Map<String , dynamic>;
+
+      final res =
+          await authInfo.login(emailController.text, passController.text);
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
       final headers = res.headers.toString();
       final str = headers;
       final start = 'sessionid=';
@@ -52,29 +51,23 @@ class LoginPageState extends State<LoginPage> {
       final endIndex = str.indexOf(end, startIndex + start.length);
       final id = str.substring(startIndex + start.length, endIndex);
       await FlutterSession().set('session', id);
-      print('ytytytytytytytytytytyt : $id');
-     
-      print("============== >>>> ${res.headers} ");
-      print("============== >>>> ${res.body} ");
-      if(res.statusCode != 200){
+
+      if (res.statusCode != 200) {
         print('error! inside login page');
-      }else {
-        
+      } else {
         AuthService.setToken(data['token'], data['refreshToken']);
-         Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
-           );
-          //  setState(){
-            isLoggedIn=true;
-          // }
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
+        //  setState(){
+        isLoggedIn = true;
+        // }
         final pref = await SharedPreferences.getInstance();
-        final islog = pref.setBool('log' , isLoggedIn);
+        final islog = pref.setBool('log', isLoggedIn);
         return data;
       }
     }
-
-    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -84,14 +77,13 @@ class LoginPageState extends State<LoginPage> {
           child: Container(
             child: Column(
               children: <Widget>[
-
                 Container(
-                 // margin : EdgeInsets.only(top :150 , right : 230) ,
-                  padding: EdgeInsets.only(top: 150, right: 230),
-                  child : Image.asset('images/eazyapp-logo-blue.png' , height : height * 0.1)
-                ),
+                    // margin : EdgeInsets.only(top :150 , right : 230) ,
+                    padding: EdgeInsets.only(top: 150, right: 230),
+                    child: Image.asset('images/eazyapp-logo-blue.png',
+                        height: height * 0.1)),
                 Container(
-                  margin: EdgeInsets.only(top: 50, right: 140),                
+                  margin: EdgeInsets.only(top: 50, right: 140),
                   // color: Colors.red,
                   child: Text(
                     'Welcome back!',
@@ -145,7 +137,7 @@ class LoginPageState extends State<LoginPage> {
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
                                   suffixIcon: Icon(Icons.email,
-                                      color: Colors.blue.shade800, size: 20),
+                                      color: myColor, size: 20),
                                   border: InputBorder.none,
                                   hintText: 'Email',
                                   hintStyle: GoogleFonts.poppins(
@@ -176,7 +168,7 @@ class LoginPageState extends State<LoginPage> {
                                         isHiddenPassword
                                             ? Icons.visibility_off
                                             : Icons.visibility,
-                                        color: Colors.blue.shade800,
+                                        color: myColor,
                                         size: 20),
                                   ),
                                   border: InputBorder.none,
@@ -221,8 +213,8 @@ class LoginPageState extends State<LoginPage> {
                               height: height * 0.05,
                               width: width * 0.87,
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    primary: Colors.blue.shade800),
+                                style:
+                                    ElevatedButton.styleFrom(primary: myColor),
                                 child: isLoading
                                     ? Row(
                                         mainAxisAlignment:
@@ -250,12 +242,13 @@ class LoginPageState extends State<LoginPage> {
                                         ),
                                       ),
                                 onPressed: () {
+                                  
                                   setState(
-                                    () => isLoading = true,
+                                    () => isLoading = false,
                                   );
                                   login(context);
                                   setState(
-                                    () => isLoading = false,
+                                    () => isLoading = true,
                                   );
                                 },
                               ),
@@ -274,6 +267,8 @@ class LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+ 
 
   void _togglePass() {
     isHiddenPassword = !isHiddenPassword;
