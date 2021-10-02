@@ -64,7 +64,7 @@ class _EazyVisitsState extends State<EazyVisits> {
     if (isLoggedIn == true) {
       Uri url = Uri.parse(
           'https://geteazyapp.com/projects/urbanplace-project-by-urbanplace-210720084736-210720090839/completed-visits/api');
-
+      
       String sessionId = await FlutterSession().get('session');
 
       String csrf = await FlutterSession().get('csrf');
