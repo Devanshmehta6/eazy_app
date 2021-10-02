@@ -24,57 +24,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   final padding = EdgeInsets.symmetric(horizontal: 10);
   Color myColor = Color(0xff4044fc);
 
-  Map mapResponse = {};
-  Future getData() async {
-    final pref = await SharedPreferences.getInstance();
-
-    final isLoggedIn = pref.getBool('log');
-
-    if (isLoggedIn == true) {
-      Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
-      print(" ================== $url");
-      String sessionId = await FlutterSession().get('session');
-      print(" ================== $sessionId");
-      String csrf = await FlutterSession().get('csrf');
-      print(" ================== $csrf");
-      final sp = await SharedPreferences.getInstance();
-      String? authorization = sp.getString('token');
-      String? tokenn = authorization;
-      final cookie = sp.getString('cookie');
-      print('Drawer widget : $csrf');
-      final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
-      http.Response response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: tokenn,
-        HttpHeaders.cookieHeader: setcookie,
-      });
-      if (response.statusCode == 200) {
-        setState(() {
-          mapResponse = json.decode(response.body);
-        });
-      }
-      print('RESPONSE BODY : ${response.body}');
-      final entireJson = jsonDecode(response.body);
-
-      //FetchData fetchData = FetchData.fromJson(entireJson);
-      //print(entireJson[0]['Name']);
-      //naam = entireJson[0]['Name'];
-
-    } else {
-      print('Logged out ');
-    }
-  }
-
-  
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getData();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -93,7 +42,6 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ),
               ),
             ),
-            
             buildMenuItem(
               text: 'EazyDashboard',
               onClicked: () => selectedItem(context, 0),

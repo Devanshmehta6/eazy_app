@@ -10,6 +10,7 @@ import 'package:eazy_app/Pages/dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_session/flutter_session.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
@@ -68,6 +69,49 @@ class LoginPageState extends State<LoginPage> {
         return data;
       }
     }
+
+    Map mapResponse = {};
+
+  Future getData() async {
+    final pref = await SharedPreferences.getInstance();
+
+    final isLoggedIn = pref.getBool('log');
+
+    if (isLoggedIn == true) {
+      Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
+
+      String sessionId = await FlutterSession().get('session');
+
+      String csrf = await FlutterSession().get('csrf');
+
+      final sp = await SharedPreferences.getInstance();
+      String? authorization = sp.getString('token');
+      String? tokenn = authorization;
+      final cookie = sp.getString('cookie');
+
+      final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
+      http.Response response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        HttpHeaders.authorizationHeader: tokenn,
+        HttpHeaders.cookieHeader: setcookie,
+      });
+      if (response.statusCode == 200) {
+        setState(() {
+          mapResponse = json.decode(response.body);
+        });
+      }
+      print('RESPONSE BODY : ${response.body}');
+      final entireJson = jsonDecode(response.body);
+
+      //FetchData fetchData = FetchData.fromJson(entireJson);
+      //print(entireJson[0]['Name']);
+      //naam = entireJson[0]['Name'];
+
+    } else {
+      print('Logged out ');
+    }
+  }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -247,6 +291,7 @@ class LoginPageState extends State<LoginPage> {
                                     () => isLoading = false,
                                   );
                                   login(context);
+                                  
                                   setState(
                                     () => isLoading = true,
                                   );
@@ -274,4 +319,6 @@ class LoginPageState extends State<LoginPage> {
     isHiddenPassword = !isHiddenPassword;
     setState(() {});
   }
+
+
 }

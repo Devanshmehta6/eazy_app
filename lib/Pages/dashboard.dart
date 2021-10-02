@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -27,16 +28,16 @@ class _DashboardState extends State<Dashboard> {
 
     if (isLoggedIn == true) {
       Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
-      print(" ================== $url");
+
       String sessionId = await FlutterSession().get('session');
-      print(" ================== $sessionId");
+
       String csrf = await FlutterSession().get('csrf');
-      print(" ================== $csrf");
+
       final sp = await SharedPreferences.getInstance();
       String? authorization = sp.getString('token');
       String? tokenn = authorization;
       final cookie = sp.getString('cookie');
-      print('Drawer widget : $csrf');
+
       final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
       http.Response response = await http.get(url, headers: {
         'Content-Type': 'application/json',
@@ -61,12 +62,17 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  late Future getallData;
+
+  getUser() async {
+    await getData();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    getData();
+    getallData = getUser();
   }
 
   @override
@@ -106,23 +112,39 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
         body: Container(
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: height * 0.05),
-              Total(context),
-              SizedBox(height: height * 0.03),
-              Direct(context),
-              SizedBox(height: height * 0.03),
-              CP(context),
-              SizedBox(height: height * 0.03),
-            ],
-          ),
+          child: FutureBuilder(
+              future: getallData,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Text('none');
+                  case ConnectionState.active:
+                    return Text('active');
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  case ConnectionState.done:
+                    return Column(
+                      children: <Widget>[
+                        SizedBox(height: height * 0.03),
+                        Total(context),
+                        SizedBox(height: height * 0.03),
+                        Direct(context),
+                        SizedBox(height: height * 0.03),
+                        CP(context),
+                        SizedBox(height: height * 0.02),
+                      ],
+                    );
+                }
+              }),
+          
         ),
       ),
     );
   }
 
-  Widget CP(BuildContext context) {
+  Widget Total(BuildContext context) {
     final height = MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
         kToolbarHeight;
@@ -133,7 +155,7 @@ class _DashboardState extends State<Dashboard> {
         Container(
           height: height * 0.28,
           width: width,
-          color: Colors.red.shade400,
+          color: Colors.blue.shade300,
           margin: EdgeInsets.only(left: 10, right: 10),
           padding: EdgeInsets.only(left: 20, top: 15),
           child: Row(
@@ -143,7 +165,7 @@ class _DashboardState extends State<Dashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Total Visits - CP',
+                    'Total Visits',
                     style: GoogleFonts.poppins(
                       fontSize: 21,
                       fontWeight: FontWeight.w700,
@@ -163,27 +185,24 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   //SizedBox(width : 50),
                   SizedBox(height: height * 0.02),
-                  mapResponse == null
-                      ? Container()
-                      : Text(
-                          mapResponse['dashboard_statistics']['cp_customers']
+                  mapResponse != null
+                      ? Text(
+                          mapResponse['dashboard_statistics']['total_customers']
                               .toString(), //"$total_customers",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               fontSize: 50,
                             ),
                           ),
-                        ),
+                        )
+                      : CircularProgressIndicator()
                 ],
               ),
-              SizedBox(width: width * 0.12),
+              SizedBox(width: width * 0.16),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
                 margin: EdgeInsets.only(bottom: 25),
-                child: Icon(
-                  FontAwesomeIcons.userTie,
-                  size: 120,
-                ),
+                child: Icon(FontAwesomeIcons.users, size: 120),
               ),
             ],
           ),
@@ -233,9 +252,8 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   //SizedBox(width : 50),
                   SizedBox(height: height * 0.02),
-                  mapResponse == null
-                      ? Container()
-                      : Text(
+                  mapResponse != null
+                      ? Text(
                           mapResponse['dashboard_statistics']
                                   ['direct_customers']
                               .toString(), //"$total_customers",
@@ -244,7 +262,8 @@ class _DashboardState extends State<Dashboard> {
                               fontSize: 50,
                             ),
                           ),
-                        ),
+                        )
+                      : CircularProgressIndicator()
                 ],
               ),
               SizedBox(width: width * 0.025),
@@ -264,7 +283,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget Total(BuildContext context) {
+  Widget CP(BuildContext context) {
     final height = MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
         kToolbarHeight;
@@ -275,7 +294,7 @@ class _DashboardState extends State<Dashboard> {
         Container(
           height: height * 0.28,
           width: width,
-          color: Colors.blue.shade300,
+          color: Colors.red.shade400,
           margin: EdgeInsets.only(left: 10, right: 10),
           padding: EdgeInsets.only(left: 20, top: 15),
           child: Row(
@@ -285,7 +304,7 @@ class _DashboardState extends State<Dashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Total Visits',
+                    'Total Visits - CP',
                     style: GoogleFonts.poppins(
                       fontSize: 21,
                       fontWeight: FontWeight.w700,
@@ -305,24 +324,27 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   //SizedBox(width : 50),
                   SizedBox(height: height * 0.02),
-                  mapResponse['dashboard_statistics']['total_customers'] == null
-                      ? Container()
-                      : Text(
-                          mapResponse['dashboard_statistics']['total_customers']
+                  mapResponse != null
+                      ? Text(
+                          mapResponse['dashboard_statistics']['cp_customers']
                               .toString(), //"$total_customers",
                           style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                               fontSize: 50,
                             ),
                           ),
-                        ),
+                        )
+                      : CircularProgressIndicator()
                 ],
               ),
-              SizedBox(width: width * 0.16),
+              SizedBox(width: width * 0.12),
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
                 margin: EdgeInsets.only(bottom: 25),
-                child: Icon(FontAwesomeIcons.users, size: 120),
+                child: Icon(
+                  FontAwesomeIcons.userTie,
+                  size: 120,
+                ),
               ),
             ],
           ),
