@@ -96,12 +96,65 @@ Widget buildMenuItem({
   );
 }
 
+class ProjectName {
+  late String Project_Name;
+
+  ProjectName(this.Project_Name);
+}
+
 class Project extends StatefulWidget {
   @override
   State<Project> createState() => _ProjectState();
 }
 
 class _ProjectState extends State<Project> {
+  Map mapResponse = {};
+  List<ProjectName> listResponse = [];
+  var projectJson;
+  Future<List<ProjectName>> getData() async {
+    final pref = await SharedPreferences.getInstance();
+
+    final isLoggedIn = pref.getBool('log');
+    print('Logged in dashboard : $isLoggedIn');
+
+    if (isLoggedIn == true) {
+      Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
+
+      String sessionId = await FlutterSession().get('session');
+
+      String csrf = await FlutterSession().get('csrf');
+
+      final sp = await SharedPreferences.getInstance();
+      String? authorization = sp.getString('token');
+      String? tokenn = authorization;
+      final cookie = sp.getString('cookie');
+
+      final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
+      http.Response response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        HttpHeaders.authorizationHeader: tokenn,
+        HttpHeaders.cookieHeader: setcookie,
+      });
+      if (response.statusCode == 200) {
+        setState(() {
+          mapResponse = json.decode(response.body);
+        });
+      }
+      print('RESPONSE BODY : ${response.body}');
+      final entireJson = jsonDecode(response.body);
+      projectJson = entireJson['projects'][0]['Project Name'];
+
+      for (var i in projectJson) {
+        ProjectName pn = ProjectName(i['Project_Name']);
+        listResponse.add(pn);
+      }
+    } else {
+      print('Logged out ');
+    }
+    return listResponse;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).copyWith(dividerColor: Colors.transparent);
@@ -128,7 +181,7 @@ class _ProjectState extends State<Project> {
               padding: EdgeInsets.only(left: 50),
               child: Row(
                 children: <Widget>[
-                  Image.asset('images/bullet.jpg', height: 15, width: 15),
+                  Image.asset('images/bullet.jpg', height: 10),
                   OutlinedButton(
                     onPressed: () {
                       Navigator.push(
@@ -137,14 +190,19 @@ class _ProjectState extends State<Project> {
                             builder: (context) => EazyVisits(),
                           ));
                     },
-                    child: Text(
-                      'UrbanPlace Project',
-                      style: TextStyle(
-                          color: color,
-                          fontSize: fontSize,
-                          fontFamily: fontFamily,
-                          fontWeight: fontWeight),
-                    ),
+                    child: FutureBuilder(
+                        future: getData(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                              if(snapshot.data==null){
+                                return Text('nul');
+                              }
+                          return ListView.builder(
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Text('name${snapshot.data[index].Project_Name}');
+                              });
+                        }),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Colors.white, width: 0),
                     ),

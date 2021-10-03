@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +11,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:flutter_session/flutter_session.dart';
 
+class User {
+  late String Name;
+  late String Phone;
+  late String Allocated_to;
+
+  User(this.Name, this.Phone, this.Allocated_to);
+}
+
+class User2 {
+  late String Name;
+  late String Phone;
+  late String Assign_to;
+
+  User2(this.Name, this.Phone, this.Assign_to);
+}
+
+class CompletedCustomer {
+  late String Name;
+  late String Phone;
+  late String Attended_by;
+
+  CompletedCustomer(this.Name, this.Phone, this.Attended_by);
+}
+
 class EazyVisits extends StatefulWidget {
   @override
   State<EazyVisits> createState() => _EazyVisitsState();
@@ -17,11 +43,18 @@ class EazyVisits extends StatefulWidget {
 class _EazyVisitsState extends State<EazyVisits> {
   Map onGoingResponse = {};
   Map completedResponse = {};
+  var entireJson;
+  var entireJson2;
+  var ongoingdata;
+  var completeddata;
+  List<User> users = [];
+  List<User2> users2 = [];
 
-  Future getOnGoing() async {
+  Future<List<User>> ongoingclass() async {
     final pref = await SharedPreferences.getInstance();
 
     final isLoggedIn = pref.getBool('log');
+    print('Logged in visit page : $isLoggedIn');
 
     if (isLoggedIn == true) {
       Uri url = Uri.parse(
@@ -43,28 +76,30 @@ class _EazyVisitsState extends State<EazyVisits> {
         HttpHeaders.authorizationHeader: tokenn,
         HttpHeaders.cookieHeader: setcookie,
       });
-      if (response.statusCode == 200) {
-        setState(() {
-          onGoingResponse = json.decode(response.body);
-        });
-      }
+
       print('RESPONSE BODY ONGOING: ${response.body}');
-      final entireJson = jsonDecode(response.body);
+      var entireJson = jsonDecode(response.body);
+      ongoingdata = entireJson['On going visits'];
+
+      for (var i in ongoingdata) {
+        User user = User(i['Name'], i['Phone'], i['Allocated_to']);
+
+        users.add(user);
+      }
     } else {
       print('Logged out ');
     }
+    return users;
   }
 
-  Future getCompleted() async {
+  Future<List<User2>> completedclass() async {
     final pref = await SharedPreferences.getInstance();
-
     final isLoggedIn = pref.getBool('log');
-    print('Logggg value:::: $isLoggedIn');
-
+    print('Logged in visit page : $isLoggedIn');
     if (isLoggedIn == true) {
       Uri url = Uri.parse(
           'https://geteazyapp.com/projects/urbanplace-project-by-urbanplace-210720084736-210720090839/completed-visits/api');
-      
+
       String sessionId = await FlutterSession().get('session');
 
       String csrf = await FlutterSession().get('csrf');
@@ -81,41 +116,23 @@ class _EazyVisitsState extends State<EazyVisits> {
         HttpHeaders.authorizationHeader: tokenn,
         HttpHeaders.cookieHeader: setcookie,
       });
-      if (response.statusCode == 200) {
-        setState(() {
-          completedResponse = json.decode(response.body);
-        });
-      }
+
       print('RESPONSE BODY COMPLETED: ${response.body}');
-      final entireJson = jsonDecode(response.body);
+      entireJson2 = jsonDecode(response.body);
+      completeddata = entireJson2['completed visits'];
 
-      //FetchData fetchData = FetchData.fromJson(entireJson);
-      //print(entireJson[0]['Name']);
-      //naam = entireJson[0]['Name'];
+      for (var u in completeddata) {
+        User2 user2 = User2(u['Name'], u['Phone'], u['Assign_to']);
 
+        users2.add(user2);
+      }
     } else {
       print('Logged out ');
     }
+    return users2;
   }
 
-  late Future getOnGoingData;
-  late Future getCompletedData;
-
-  OnGoingData() async {
-    await getOnGoing();
-  }
-
-  CompletedData() async {
-    await getCompleted();
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getOnGoingData = OnGoingData();
-    getCompletedData = CompletedData();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -212,176 +229,181 @@ class _EazyVisitsState extends State<EazyVisits> {
         body: TabBarView(
           children: [
             FutureBuilder(
-                future: getOnGoingData,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Text('none');
-                    case ConnectionState.active:
-                      return Text('active');
-                    case ConnectionState.waiting:
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    case ConnectionState.done:
-                      if (onGoingResponse['On going visits']
-                          .isNotEmpty) {
-                        return DetailCardOnGoing(context);
-                      }
-                      return Text('No data available');
-                  }
-                }),
+              future: ongoingclass(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                final height = MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight;
+                final width = MediaQuery.of(context).size.width;
+                if (snapshot.data == null) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  return ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          margin: EdgeInsets.only(
+                              top: height * 0.005, bottom: height * 0.60),
+                          child: Card(
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                children: <Widget>[
+                                  Image.asset('images/user_image.png',
+                                      height: 100, width: 100),
+                                  VerticalDivider(
+                                    color: Colors.grey,
+                                    thickness: 1.5,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: Text(
+                                          'Name : ${snapshot.data[index].Name}',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: Text(
+                                          'Phone : ${snapshot.data[index].Phone}',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: snapshot
+                                                    .data[index].Allocated_to ==
+                                                null
+                                            ? Text(
+                                                'Allocated To : -',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              )
+                                            : Text(
+                                                'Allocated To : ${snapshot.data[index].Allocated_to}',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ); //Text(snapshot.data[index].Name),
+                      });
+                }
+              },
+            ),
             FutureBuilder(
-                future: getCompletedData,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Text('none');
-                    case ConnectionState.active:
-                      return Text('active');
-                    case ConnectionState.waiting:
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    case ConnectionState.done:
-                      if (completedResponse['completed visits']
-                          .isNotEmpty) {
-                        return DetailCardCompleted(context);
-                      }
-                      return Text('No data available');
-                  }
-                }),
+              future: completedclass(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.data == null) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  return ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          margin: EdgeInsets.only(
+                              top: height * 0.005, bottom: height * 0.60),
+                          child: Card(
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                children: <Widget>[
+                                  Image.asset('images/user_image.png',
+                                      height: 100, width: 100),
+                                  VerticalDivider(
+                                    color: Colors.grey,
+                                    thickness: 1.5,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: Text(
+                                          'Name : ${snapshot.data[index].Name}',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: Text(
+                                          'Phone : ${snapshot.data[index].Phone}',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(top: 9),
+                                        child: snapshot
+                                                    .data[index].Assign_to ==
+                                                null
+                                            ? Text(
+                                                'Assigned To : -',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ) : Text(
+                                          'Assigned To : ${snapshot.data[index].Assign_to}',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      });
+                }
+              },
+            ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget DetailCardOnGoing(BuildContext context) {
-    final height = MediaQuery.of(context).size.height -
-        MediaQuery.of(context).padding.top -
-        kToolbarHeight;
-    final width = MediaQuery.of(context).size.width;
-    return Container(
-      margin: EdgeInsets.only(top: height * 0.005, bottom: height * 0.60),
-      child: Card(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Row(
-            children: <Widget>[
-              Image.asset('images/user_image.png', height: 100, width: 100),
-              VerticalDivider(
-                color: Colors.grey,
-                thickness: 1.5,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Name : ${onGoingResponse['On going visits'][0]['Name']}', 
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Phone : ${onGoingResponse['On going visits'][0]['Phone']}',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Allocated To : ${onGoingResponse['On going visits'][0]['Assign_to']}',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget DetailCardCompleted(BuildContext context) {
-    final height = MediaQuery.of(context).size.height -
-        MediaQuery.of(context).padding.top -
-        kToolbarHeight;
-    final width = MediaQuery.of(context).size.width;
-    return Container(
-      margin: EdgeInsets.only(top: height * 0.005, bottom: height * 0.59),
-      child: Card(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Row(
-            children: <Widget>[
-              Image.asset('images/user_image.png', height: 100, width: 100),
-              VerticalDivider(
-                color: Colors.grey,
-                thickness: 1.5,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Name : ${completedResponse['completed visits'][0]['Name']}', //'Name : ${mapResponse['customers_ser'][0]['first_name'].toString()} ${mapResponse['customers_ser'][0]['last_name'].toString()}',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Phone : ${completedResponse['completed visits'][0]['Phone']}',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 9),
-                    child: Text(
-                      'Attended by : ${completedResponse['completed visits'][0]['was assign']}',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );

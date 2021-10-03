@@ -25,6 +25,7 @@ class _DashboardState extends State<Dashboard> {
     final pref = await SharedPreferences.getInstance();
 
     final isLoggedIn = pref.getBool('log');
+    print('Logged in dashboard : $isLoggedIn');
 
     if (isLoggedIn == true) {
       Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
@@ -84,61 +85,65 @@ class _DashboardState extends State<Dashboard> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        endDrawer: NavigationDrawerWidget(),
-        appBar: AppBar(
-          //centerTitle : true,
-          iconTheme: IconThemeData(color: Colors.blue.shade800),
-          backgroundColor: Colors.white,
-          title: Row(
-            children: <Widget>[
-              //SizedBox(width: width * 0.7),
-              Image.asset(
-                'images/eazyapp-logo-blue.png',
-                height: 48,
-                width: 40,
-              ),
-              SizedBox(width: width * 0.22),
-              Text(
-                'EazyDashboard',
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                      color: myColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+      home: WillPopScope(
+        onWillPop: () async {
+          return true;
+        },
+        child: Scaffold(
+          endDrawer: NavigationDrawerWidget(),
+          appBar: AppBar(
+            //centerTitle : true,
+            iconTheme: IconThemeData(color: Colors.blue.shade800),
+            backgroundColor: Colors.white,
+            title: Row(
+              children: <Widget>[
+                //SizedBox(width: width * 0.7),
+                Image.asset(
+                  'images/eazyapp-logo-blue.png',
+                  height: 48,
+                  width: 40,
                 ),
-              ),
-            ],
+                SizedBox(width: width * 0.22),
+                Text(
+                  'EazyDashboard',
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                        color: myColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        body: Container(
-          child: FutureBuilder(
-              future: getallData,
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                    return Text('none');
-                  case ConnectionState.active:
-                    return Text('active');
-                  case ConnectionState.waiting:
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  case ConnectionState.done:
-                    return Column(
-                      children: <Widget>[
-                        SizedBox(height: height * 0.03),
-                        Total(context),
-                        SizedBox(height: height * 0.03),
-                        Direct(context),
-                        SizedBox(height: height * 0.03),
-                        CP(context),
-                        SizedBox(height: height * 0.02),
-                      ],
-                    );
-                }
-              }),
-          
+          body: Container(
+            child: FutureBuilder(
+                future: getallData,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return Text('none');
+                    case ConnectionState.active:
+                      return Text('active');
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    case ConnectionState.done:
+                      return Column(
+                        children: <Widget>[
+                          SizedBox(height: height * 0.03),
+                          Total(context),
+                          SizedBox(height: height * 0.03),
+                          Direct(context),
+                          SizedBox(height: height * 0.03),
+                          CP(context),
+                          SizedBox(height: height * 0.02),
+                        ],
+                      );
+                  }
+                }),
+          ),
         ),
       ),
     );
@@ -202,7 +207,8 @@ class _DashboardState extends State<Dashboard> {
               Container(
                 // padding : EdgeInsets.only(bottom: 20),
                 margin: EdgeInsets.only(bottom: 25),
-                child: Icon(FontAwesomeIcons.users, size: 120),
+                child: Icon(FontAwesomeIcons.users,
+                    size: 120, color: Colors.blue.shade100),
               ),
             ],
           ),
@@ -344,6 +350,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Icon(
                   FontAwesomeIcons.userTie,
                   size: 120,
+                  color: Colors.red.shade100,
                 ),
               ),
             ],
