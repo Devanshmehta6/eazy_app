@@ -97,9 +97,9 @@ Widget buildMenuItem({
 }
 
 class ProjectName {
-  late String Project_Name;
+  late String Project_name;
 
-  ProjectName(this.Project_Name);
+  ProjectName(this.Project_name);
 }
 
 class Project extends StatefulWidget {
@@ -111,6 +111,8 @@ class _ProjectState extends State<Project> {
   Map mapResponse = {};
   List<ProjectName> listResponse = [];
   var projectJson;
+  late String token;
+  late String settoken;
   Future<List<ProjectName>> getData() async {
     final pref = await SharedPreferences.getInstance();
 
@@ -126,27 +128,28 @@ class _ProjectState extends State<Project> {
 
       final sp = await SharedPreferences.getInstance();
       String? authorization = sp.getString('token');
+      final token = await AuthService.getToken();
       String? tokenn = authorization;
       final cookie = sp.getString('cookie');
+      final settoken = 'Token ${token['token']}';
+      print('Set token :: $settoken');
 
       final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
       http.Response response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: tokenn,
+        'Authorization': settoken,
         HttpHeaders.cookieHeader: setcookie,
       });
-      if (response.statusCode == 200) {
-        setState(() {
-          mapResponse = json.decode(response.body);
-        });
-      }
-      print('RESPONSE BODY : ${response.body}');
+
+      mapResponse = json.decode(response.body);
+
+      print('RESPONSE BODY OF DRAWER: ${response.body}');
       final entireJson = jsonDecode(response.body);
-      projectJson = entireJson['projects'][0]['Project Name'];
+      projectJson = entireJson['projects'];
 
       for (var i in projectJson) {
-        ProjectName pn = ProjectName(i['Project_Name']);
+        ProjectName pn = ProjectName(i['Project_name']);
         listResponse.add(pn);
       }
     } else {
@@ -181,32 +184,20 @@ class _ProjectState extends State<Project> {
               padding: EdgeInsets.only(left: 50),
               child: Row(
                 children: <Widget>[
-                  Image.asset('images/bullet.jpg', height: 10),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EazyVisits(),
-                          ));
-                    },
-                    child: FutureBuilder(
-                        future: getData(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                              if(snapshot.data==null){
-                                return Text('nul');
-                              }
-                          return ListView.builder(
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Text('name${snapshot.data[index].Project_Name}');
-                              });
-                        }),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.white, width: 0),
-                    ),
-                  ),
+                  FutureBuilder(
+                      future: getData(),
+                      builder: (context, AsyncSnapshot snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return Text('none');
+                          case ConnectionState.active:
+                            return Text('active');
+                          case ConnectionState.waiting:
+                            return Text('waiting');
+                          case ConnectionState.done:
+                            return Text(snapshot.toString());
+                        }
+                      }),
                 ],
 
                 //   Padding(

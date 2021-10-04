@@ -1,5 +1,6 @@
 import 'dart:core';
-
+import 'package:eazy_app/Pages/customer_check.dart/first.dart';
+import 'package:eazy_app/Pages/customer_check.dart/first.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:flutter_session/flutter_session.dart';
+import 'package:eazy_app/Services/auth_service.dart';
 
 class User {
   late String Name;
@@ -49,6 +51,8 @@ class _EazyVisitsState extends State<EazyVisits> {
   var completeddata;
   List<User> users = [];
   List<User2> users2 = [];
+  late String token;
+  late String settoken;
 
   Future<List<User>> ongoingclass() async {
     final pref = await SharedPreferences.getInstance();
@@ -68,12 +72,14 @@ class _EazyVisitsState extends State<EazyVisits> {
       String? authorization = sp.getString('token');
       String? tokenn = authorization;
       final cookie = sp.getString('cookie');
+      final token = await AuthService.getToken();
+      final settoken = 'Token ${token['token']}';
 
       final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
       http.Response response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: tokenn,
+        'Authorization': settoken,
         HttpHeaders.cookieHeader: setcookie,
       });
 
@@ -155,7 +161,13 @@ class _EazyVisitsState extends State<EazyVisits> {
                 width: width * 0.48,
                 child: FlatButton(
                   color: Colors.blue,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FirstPage(),
+                          ));
+                  },
                   child: Text(
                     'Customer Check In',
                     style: GoogleFonts.poppins(
@@ -236,8 +248,8 @@ class _EazyVisitsState extends State<EazyVisits> {
                     kToolbarHeight;
                 final width = MediaQuery.of(context).size.width;
                 if (snapshot.data == null) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
+                  return Center(child:CircularProgressIndicator());
+                } else if(snapshot.data!=null){
                   return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context, int index) {
@@ -315,7 +327,11 @@ class _EazyVisitsState extends State<EazyVisits> {
                           ),
                         ); //Text(snapshot.data[index].Name),
                       });
+                   
+                }else {
+                  return Text('abfyqg');
                 }
+                
               },
             ),
             FutureBuilder(
@@ -323,7 +339,7 @@ class _EazyVisitsState extends State<EazyVisits> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.data == null) {
                   return Center(child: CircularProgressIndicator());
-                } else {
+                } else if(snapshot.data != null) {
                   return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context, int index) {
@@ -400,6 +416,9 @@ class _EazyVisitsState extends State<EazyVisits> {
                           ),
                         );
                       });
+                }
+                else {
+                  return Text('NI');
                 }
               },
             ),

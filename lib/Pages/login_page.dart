@@ -55,68 +55,35 @@ class LoginPageState extends State<LoginPage> {
 
       if (res.statusCode != 200) {
         print('error! inside login page');
+        
       } else {
-        AuthService.setToken(data['token'], data['refreshToken']);
+        AuthService.setToken(
+          data['token'],
+        );
+        
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Dashboard()),
         );
-        
+
         isLoggedIn = true;
-        
+
         final pref = await SharedPreferences.getInstance();
         final log = pref.setBool('log', isLoggedIn);
         print('Logged in login page : $log');
+        print(res.body);
+        final token = await AuthService.getToken();
+        print('Token ${token['token']}');
+
         return data;
-        
       }
     }
 
     Map mapResponse = {};
 
-  Future getData() async {
-    final pref = await SharedPreferences.getInstance();
-
-    final isLoggedIn = pref.getBool('log');
-
-    if (isLoggedIn == true) {
-      Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
-
-      String sessionId = await FlutterSession().get('session');
-
-      String csrf = await FlutterSession().get('csrf');
-
-      final sp = await SharedPreferences.getInstance();
-      String? authorization = sp.getString('token');
-      String? tokenn = authorization;
-      final cookie = sp.getString('cookie');
-
-      final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
-      http.Response response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: tokenn,
-        HttpHeaders.cookieHeader: setcookie,
-      });
-      if (response.statusCode == 200) {
-        setState(() {
-          mapResponse = json.decode(response.body);
-        });
-      }
-      print('RESPONSE BODY : ${response.body}');
-      final entireJson = jsonDecode(response.body);
-
-      //FetchData fetchData = FetchData.fromJson(entireJson);
-      //print(entireJson[0]['Name']);
-      //naam = entireJson[0]['Name'];
-
-    } else {
-      print('Logged out ');
-    }
-  }
-
+    
     return WillPopScope(
-      onWillPop: ()async{
+      onWillPop: () async {
         return false;
       },
       child: Scaffold(
@@ -180,10 +147,14 @@ class LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                                 child: TextFormField(
+                                  style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                    fontSize: 16,
+                                  )),
                                   controller: emailController,
                                   autovalidate: true,
-                                  validator:
-                                      EmailValidator(errorText: 'Invalid Email'),
+                                  validator: EmailValidator(
+                                      errorText: 'Invalid Email'),
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                     suffixIcon: Icon(Icons.email,
@@ -208,6 +179,10 @@ class LoginPageState extends State<LoginPage> {
                                         bottom: BorderSide(
                                             color: Colors.grey.shade100))),
                                 child: TextFormField(
+                                  style: GoogleFonts.poppins(
+                                      textStyle: TextStyle(
+                                    fontSize: 16,
+                                  )),
                                   controller: passController,
                                   autovalidate: true,
                                   obscureText: isHiddenPassword,
@@ -237,8 +212,8 @@ class LoginPageState extends State<LoginPage> {
                                 margin: EdgeInsets.only(left: 190),
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
-                                    side:
-                                        BorderSide(width: 0, color: Colors.white),
+                                    side: BorderSide(
+                                        width: 0, color: Colors.white),
                                   ),
                                   child: Text('Forgot Password?',
                                       style: GoogleFonts.poppins(
@@ -263,8 +238,8 @@ class LoginPageState extends State<LoginPage> {
                                 height: height * 0.05,
                                 width: width * 0.87,
                                 child: ElevatedButton(
-                                  style:
-                                      ElevatedButton.styleFrom(primary: myColor),
+                                  style: ElevatedButton.styleFrom(
+                                      primary: myColor),
                                   child: isLoading
                                       ? Row(
                                           mainAxisAlignment:
@@ -292,12 +267,11 @@ class LoginPageState extends State<LoginPage> {
                                           ),
                                         ),
                                   onPressed: () {
-                                    
                                     setState(
                                       () => isLoading = false,
                                     );
                                     login(context);
-                                    
+
                                     setState(
                                       () => isLoading = false,
                                     );
@@ -320,12 +294,8 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
- 
-
   void _togglePass() {
     isHiddenPassword = !isHiddenPassword;
     setState(() {});
   }
-
-
 }

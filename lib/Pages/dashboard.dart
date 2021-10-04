@@ -9,6 +9,7 @@ import 'package:flutter_session/flutter_session.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:eazy_app/Services/auth_service.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -20,7 +21,8 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   Color myColor = Color(0xff4044fc);
   Map mapResponse = {};
-
+  late String token;
+  late String settoken;
   Future getData() async {
     final pref = await SharedPreferences.getInstance();
 
@@ -28,6 +30,10 @@ class _DashboardState extends State<Dashboard> {
     print('Logged in dashboard : $isLoggedIn');
 
     if (isLoggedIn == true) {
+      final token = await AuthService.getToken();
+      //print('TOKENENNENEN :$token');
+      final settoken = 'Token ${token['token']}';
+      print('Set token :: $settoken');
       Uri url = Uri.parse('https://geteazyapp.com/dashboard_api/');
 
       String sessionId = await FlutterSession().get('session');
@@ -35,17 +41,27 @@ class _DashboardState extends State<Dashboard> {
       String csrf = await FlutterSession().get('csrf');
 
       final sp = await SharedPreferences.getInstance();
-      String? authorization = sp.getString('token');
-      String? tokenn = authorization;
+      //String? authorization = sp.getString('token');
+      //String? tokenn = authorization;
+      // final token = await AuthService.getToken();
+      // print('TOKENENNENEN :$token');
+      // final settoken = token['token'];
+      print('Token $settoken');
+
+      //final finalToken = 'Token ${token[token]}';
+
       final cookie = sp.getString('cookie');
 
       final setcookie = "csrftoken=$csrf; sessionid=$sessionId";
-      http.Response response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        HttpHeaders.authorizationHeader: tokenn,
-        HttpHeaders.cookieHeader: setcookie,
-      });
+      http.Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': settoken,
+          HttpHeaders.cookieHeader: setcookie,
+        },
+      );
       if (response.statusCode == 200) {
         setState(() {
           mapResponse = json.decode(response.body);

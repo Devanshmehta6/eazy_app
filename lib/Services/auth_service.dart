@@ -20,8 +20,8 @@ class AuthService {
     }
   }
 
-  static setToken(String token, String refreshToken) async {
-    AuthData data = AuthData(token, refreshToken);
+  static setToken(String token ) async {
+    AuthData data = AuthData(token);
     return await SESSION.set('tokens', data);
   }
 
@@ -38,14 +38,14 @@ class AuthService {
 
 class AuthData{
 
-  String token , refreshToken;
-  AuthData(this.token ,this.refreshToken);
+  String token ;
+  AuthData(this.token);
 
   Map<String , dynamic> toJson(){
     final Map<String , dynamic> data = Map<String , dynamic>();
 
     data['token'] = token;
-    data['refreshToken'] = refreshToken;
+    
     return data;
   }
 }
