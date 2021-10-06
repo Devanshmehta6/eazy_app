@@ -45,33 +45,28 @@ class _SecondPageState extends State<SecondPage> {
                   ),
                 ),
                 SizedBox(height: height * 0.04),
-                Text(
-                  'Check In - UrbanPlace Project',
+                Padding(
+                  padding : EdgeInsets.only(left : width*0.1),
+                  child : Text(
+                  'UrbanPlace Welcomes you to , UrbanPlace Project',
                   style: GoogleFonts.poppins(
                     textStyle:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: height * 0.02,
-                      left: width * 0.075,
-                      ),
-                  child: Text(
-                    '',
-                    style: GoogleFonts.poppins(
-                      textStyle:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
-                    ),
-                  ),
                 ),
-                SizedBox(height: height * 0.02),
+                
+                SizedBox(height: height * 0.01),
                 Container(
-                  margin: EdgeInsets.only(top: 10, left: width * 0.075 ,  right: width*0.075),
+                  margin: EdgeInsets.only(top: height*0.015, left: width * 0.050 ,  right: width*0.050),
                   padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: myColor),
+                      top: BorderSide(color: myColor),
+                      left: BorderSide(color: myColor),
+                      right: BorderSide(color: myColor),
+
                     ),
                   ),
                   child: TextFormField(
@@ -83,7 +78,39 @@ class _SecondPageState extends State<SecondPage> {
                     decoration: InputDecoration(
                       suffixIcon: Icon(Icons.phone, color: myColor, size: 20),
                       border: InputBorder.none,
-                      hintText: 'Enter your 10 digit mobile number',
+                      hintText: 'Enter First Name',
+                      hintStyle: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
+                            color: Colors.grey.shade700),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: height * 0.01),
+                Container(
+                  margin: EdgeInsets.only(top: height*0.015, left: width * 0.050 ,  right: width*0.050),
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: myColor),
+                      top: BorderSide(color: myColor),
+                      left: BorderSide(color: myColor),
+                      right: BorderSide(color: myColor),
+
+                    ),
+                  ),
+                  child: TextFormField(
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(color: myColor, fontSize: 16),
+                    ),
+                    autovalidate: true,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      suffixIcon: Icon(Icons.phone, color: myColor, size: 20),
+                      border: InputBorder.none,
+                      hintText: 'Enter Last Name',
                       hintStyle: GoogleFonts.poppins(
                         textStyle: TextStyle(
                             fontWeight: FontWeight.w300,

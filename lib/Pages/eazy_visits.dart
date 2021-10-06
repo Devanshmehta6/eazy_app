@@ -138,8 +138,6 @@ class _EazyVisitsState extends State<EazyVisits> {
     return users2;
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height -
@@ -158,15 +156,15 @@ class _EazyVisitsState extends State<EazyVisits> {
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
-                width: width * 0.48,
+                width: width * 0.50,
                 child: FlatButton(
                   color: Colors.blue,
                   onPressed: () {
                     Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FirstPage(),
-                          ));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FirstPage(),
+                        ));
                   },
                   child: Text(
                     'Customer Check In',
@@ -179,9 +177,9 @@ class _EazyVisitsState extends State<EazyVisits> {
                   ),
                 ),
               ),
-              VerticalDivider(thickness: 1, color: Colors.grey),
+              
               Container(
-                width: width * 0.48,
+                width: width * 0.50,
                 child: FlatButton(
                   color: Colors.grey,
                   onPressed: () {},
@@ -248,14 +246,14 @@ class _EazyVisitsState extends State<EazyVisits> {
                     kToolbarHeight;
                 final width = MediaQuery.of(context).size.width;
                 if (snapshot.data == null) {
-                  return Center(child:CircularProgressIndicator());
-                } else if(snapshot.data!=null){
+                  return Center(child: CircularProgressIndicator());
+                } else {
                   return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Container(
                           margin: EdgeInsets.only(
-                              top: height * 0.005, bottom: height * 0.60),
+                              top: height * 0.005,),
                           child: Card(
                             child: Container(
                               padding: EdgeInsets.all(10),
@@ -327,11 +325,7 @@ class _EazyVisitsState extends State<EazyVisits> {
                           ),
                         ); //Text(snapshot.data[index].Name),
                       });
-                   
-                }else {
-                  return Text('abfyqg');
-                }
-                
+                } 
               },
             ),
             FutureBuilder(
@@ -339,13 +333,13 @@ class _EazyVisitsState extends State<EazyVisits> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.data == null) {
                   return Center(child: CircularProgressIndicator());
-                } else if(snapshot.data != null) {
+                } else if (snapshot.data != null) {
                   return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Container(
                           margin: EdgeInsets.only(
-                              top: height * 0.005, bottom: height * 0.60),
+                              top: height * 0.005, bottom: height * 0.30),
                           child: Card(
                             child: Container(
                               padding: EdgeInsets.all(10),
@@ -358,8 +352,8 @@ class _EazyVisitsState extends State<EazyVisits> {
                                     thickness: 1.5,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    //crossAxisAlignment:
+                                    // CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         padding: EdgeInsets.only(top: 9),
@@ -387,8 +381,7 @@ class _EazyVisitsState extends State<EazyVisits> {
                                       ),
                                       Container(
                                         padding: EdgeInsets.only(top: 9),
-                                        child: snapshot
-                                                    .data[index].Assign_to ==
+                                        child: snapshot.data[index].Assign_to ==
                                                 null
                                             ? Text(
                                                 'Assigned To : -',
@@ -398,15 +391,16 @@ class _EazyVisitsState extends State<EazyVisits> {
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              ) : Text(
-                                          'Assigned To : ${snapshot.data[index].Assign_to}',
-                                          style: GoogleFonts.poppins(
-                                            textStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
+                                              )
+                                            : Text(
+                                                'Assigned To : ${snapshot.data[index].Assign_to}',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
                                       ),
                                     ],
                                   ),
@@ -416,8 +410,7 @@ class _EazyVisitsState extends State<EazyVisits> {
                           ),
                         );
                       });
-                }
-                else {
+                } else {
                   return Text('NI');
                 }
               },

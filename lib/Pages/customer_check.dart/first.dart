@@ -22,21 +22,15 @@ class _FirstPageState extends State<FirstPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.blue.shade50,
+        backgroundColor: Colors.white,
         body: Center(
           child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20),
-                )),
-            margin: EdgeInsets.only(top: height * 0.04),
-            height: height * 0.75,
+            height: height,
             child: Column(
               children: <Widget>[
                 Container(
                   height: height * 0.1,
-                  margin: EdgeInsets.only(top: height * 0.05),
+                  margin: EdgeInsets.only(top: height * 0.2),
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('images/eazyapp-logo-blue.png'),
@@ -53,9 +47,9 @@ class _FirstPageState extends State<FirstPage> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                      top: height * 0.02,
-                      left: width * 0.075,
-                      ),
+                    top: height * 0.02,
+                    left: width * 0.075,
+                  ),
                   child: Text(
                     '',
                     style: GoogleFonts.poppins(
@@ -66,7 +60,8 @@ class _FirstPageState extends State<FirstPage> {
                 ),
                 SizedBox(height: height * 0.02),
                 Container(
-                  margin: EdgeInsets.only(top: 10, left: width * 0.075 ,  right: width*0.075),
+                  margin: EdgeInsets.only(
+                      top: 10, left: width * 0.075, right: width * 0.075),
                   padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border(
@@ -92,7 +87,7 @@ class _FirstPageState extends State<FirstPage> {
                     ),
                   ),
                 ),
-                SizedBox(height : height*0.05),
+                SizedBox(height: height * 0.05),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -107,15 +102,15 @@ class _FirstPageState extends State<FirstPage> {
                         ),
                       ),
                       onPressed: () {
-                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EazyVisits(),
-                          ));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EazyVisits(),
+                            ));
                       },
                       child: Text('Go back'),
                     ),
-                    SizedBox(width : width*0.04),
+                    SizedBox(width: width * 0.04),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: myColor,
@@ -127,10 +122,10 @@ class _FirstPageState extends State<FirstPage> {
                       ),
                       onPressed: () {
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SecondPage(),
-                          ));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SecondPage(),
+                            ));
                       },
                       child: Text('Submit'),
                     ),
