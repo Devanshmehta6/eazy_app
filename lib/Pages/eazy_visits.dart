@@ -59,10 +59,12 @@ class _EazyVisitsState extends State<EazyVisits> {
 
     final isLoggedIn = pref.getBool('log');
     print('Logged in visit page : $isLoggedIn');
+    final project_url = ModalRoute.of(context)!.settings.arguments.toString();
+    
 
     if (isLoggedIn == true) {
       Uri url = Uri.parse(
-          'https://geteazyapp.com/projects/urbanplace-project-by-urbanplace-210720084736-210720090839/on-going-visits/api');
+          'https://geteazyapp.com/projects/$project_url/on-going-visits/api');
 
       String sessionId = await FlutterSession().get('session');
 
@@ -84,19 +86,24 @@ class _EazyVisitsState extends State<EazyVisits> {
       });
 
       print('RESPONSE BODY ONGOING: ${response.body}');
+      
       var entireJson = jsonDecode(response.body);
       ongoingdata = entireJson['On going visits'];
 
       for (var i in ongoingdata) {
         User user = User(i['Name'], i['Phone'], i['Allocated_to']);
 
+
         users.add(user);
       }
     } else {
       print('Logged out ');
+
     }
     return users;
   }
+
+  
 
   Future<List<User2>> completedclass() async {
     final pref = await SharedPreferences.getInstance();
@@ -140,6 +147,8 @@ class _EazyVisitsState extends State<EazyVisits> {
 
   @override
   Widget build(BuildContext context) {
+    
+    
     final height = MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
         kToolbarHeight;

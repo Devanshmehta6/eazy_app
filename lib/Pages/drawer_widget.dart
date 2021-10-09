@@ -1,8 +1,10 @@
-
 import 'dart:io';
 import 'dart:convert';
 import 'package:eazy_app/Pages/customer_check.dart/first.dart';
 import 'package:eazy_app/Services/auth_service.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:eazy_app/Pages/dashboard.dart';
@@ -14,7 +16,6 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_session/flutter_session.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 
 // import 'package:dio/dio.dart' as http;
 import 'package:eazy_app/Services/teams_json.dart';
@@ -28,23 +29,30 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   final padding = EdgeInsets.symmetric(horizontal: 10);
   Color myColor = Color(0xff4044fc);
   List<User> users = [];
-  bool pressed = false;
+  bool is1Selected = false;
+  bool is2Selected = false;
+  bool is3Selected = false;
+  var jsonData;
+  var ima;
 
-  // changeText() {
-  //   if (pressed = true) {
-  //     return Text(
-  //       'True',
-  //       style: TextStyle(color: Colors.red),
-  //     );
-  //   } else {
-  //     return Text(
-  //       'False',
-  //       style: TextStyle(color: Colors.green),
-  //     );
-  //   }
-  // }
+  List<bool> bool_list = [
+    false,
+    false,
+    false,
+  ];
 
-  Future<List<User>> getUsers() async {
+  List<String> title_list = ['EazyDashboard', 'EazyVisits', 'EazyTeams'];
+
+  List<Widget> page_list = [
+    Dashboard(),
+    EazyVisits(),
+    EazyTeams(),
+  ];
+
+  int selectedIndex = 0;
+  int count = 0;
+
+  Future<List<User>> getVisits() async {
     final pref = await SharedPreferences.getInstance();
 
     final isLoggedIn = pref.getBool('log');
@@ -73,6 +81,11 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         HttpHeaders.cookieHeader: setcookie,
       });
       final jsonData = jsonDecode(response.body);
+      print('jsonnnnn data $jsonData');
+      print(jsonData['Developer_logo']);
+      var ima = jsonData['Developer_logo'][0].toString();
+      print('IMAIAMIAMI $ima');
+
       final projectData = jsonData['projects'];
 
       for (var u in projectData) {
@@ -94,152 +107,217 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     final width = MediaQuery.of(context).size.width;
 
     return Drawer(
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: height * 0.2,
-            padding: EdgeInsets.only(top: height * 0.01),
-            child: DrawerHeader(
-              padding:
-                  EdgeInsets.only(left: 10, right: 10, bottom: 15, top: 15),
-              child: Image.asset(
-                'images/urbanplace.png',
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: height * 0.2,
+              padding: EdgeInsets.only(top: height * 0.01),
+              child: DrawerHeader(
+                padding:
+                    EdgeInsets.only(left: 10, right: 10, bottom: 15, top: 15),
+                child: Image.network(
+                  '$ima',
+                ),
               ),
             ),
-          ),
-          //Divider(),
-         // changeText(),
-          // ListTile(
-          //   title: Row(
-          //     children: [
-          //       Icon(FontAwesomeIcons.chartPie, color: myColor),
-          //       SizedBox(width: width * 0.06),
-          //       Text('EazyDashboard'),
-          //     ],
-          //   ),
-          //   onTap: () {
-          //     setState(() {
-          //       pressed = false;
-          //     });
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => Dashboard(),
-          //       ),
-          //     );
-          //   },
-          // ),
-          SizedBox(height: height * 0.02),
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
+            //EAZY DASHBOARD
+            ListTile(
               title: Row(
                 children: [
-                  Icon(FontAwesomeIcons.users),
+                  SizedBox(width: width * 0.01),
+                  Icon(FontAwesomeIcons.chartPie, color: myColor),
                   SizedBox(width: width * 0.06),
                   Text(
-                    'EazyVisits',
+                    'EazyDashboard',
                     style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 18,
-                        color: myColor,
-                      ),
+                      textStyle: TextStyle(fontSize: 18, color: myColor),
                     ),
-                  ),
+                  )
                 ],
               ),
-              children: [
-                Container(
-                  child: FutureBuilder(
-                    future: getUsers(),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.data == null) {
-                        return CircularProgressIndicator();
-                      } else {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              child: Theme(
-                                data: Theme.of(context)
-                                    .copyWith(dividerColor: Colors.transparent),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: width * 0.08),
-                                    Icon(FontAwesomeIcons.userClock),
-                                    SizedBox(width: width * 0.05),
-                                    Container(
-                                      padding: EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        snapshot.data[index].project_name,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 16, color: myColor),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Dashboard()));
+              },
+            ),
+
+            //EAZY VISITS
+            Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: Column(
+                //height: height*0.15,
+
+                children: [
+                  ExpansionTile(
+                      iconColor: Colors.black,
+                      childrenPadding: EdgeInsets.all(0),
+                      title: Row(
+                        children: [
+                          SizedBox(width: width * 0.01),
+                          Icon(
+                            FontAwesomeIcons.users,
+                          ),
+                          SizedBox(width: width * 0.06),
+                          Text(
+                            title_list[1],
+                            style: GoogleFonts.poppins(
+                              textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                      children: [
+                        FutureBuilder(
+                          future: getVisits(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.data == null) {
+                              return CircularProgressIndicator();
+                            }
+                            return ListView.builder(
+                              padding: EdgeInsets.all(0),
+                              shrinkWrap: true,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) =>
+                                  ListTile(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EazyVisits(),
+                                            settings: RouteSettings(
+                                                arguments: snapshot
+                                                    .data[index].project_url),
+                                          ),
+                                        );
+                                      },
+                                      title: Row(
+                                        children: [
+                                          SizedBox(width: width * 0.06),
+                                          Icon(FontAwesomeIcons.userClock,
+                                              color: Colors.grey, size: 18),
+                                          SizedBox(width: width * 0.04),
+                                          Text(
+                                            snapshot.data[index].project_name,
+                                            style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                    color: Colors.blueGrey,
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
+                                        ],
+                                      )),
                             );
                           },
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: height * 0.02),
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              title: Row(
-                children: [
-                  Icon(FontAwesomeIcons.userTie),
-                  SizedBox(width: width * 0.06),
-                  Text(
-                    'EazyTeams',
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        fontSize: 18,
-                        color: myColor,
-                      ),
-                    ),
-                  ),
+                        ),
+                      ]),
                 ],
               ),
-              children: [],
             ),
-          ),
-          SizedBox(height: height * 0.02),
-          Divider(thickness: 0.3),
-          ListTile(
-            title: Row(
-              children: [
+
+            Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: Column(
+                //height: height*0.15,
+
+                children: [
+                  ExpansionTile(
+                      iconColor: Colors.black,
+                      childrenPadding: EdgeInsets.all(0),
+                      title: Row(
+                        children: [
+                          SizedBox(width: width * 0.01),
+                          Icon(
+                            FontAwesomeIcons.userTie,
+                          ),
+                          SizedBox(width: width * 0.06),
+                          Text(
+                            title_list[2],
+                            style: GoogleFonts.poppins(
+                              textStyle:
+                                  TextStyle(fontSize: 18, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                      children: [
+                        FutureBuilder(
+                          future: getVisits(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.data == null) {
+                              return CircularProgressIndicator();
+                            }
+                            return ListView.builder(
+                              padding: EdgeInsets.all(0),
+                              shrinkWrap: true,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) =>
+                                  ListTile(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EazyVisits(),
+                                            settings: RouteSettings(
+                                                arguments: snapshot
+                                                    .data[index].project_url),
+                                          ),
+                                        );
+                                      },
+                                      title: Row(
+                                        children: [
+                                          SizedBox(width: width * 0.06),
+                                          Icon(FontAwesomeIcons.userFriends,
+                                              color: Colors.grey, size: 18),
+                                          SizedBox(width: width * 0.04),
+                                          Text(
+                                            snapshot.data[index].project_name,
+                                            style: GoogleFonts.poppins(
+                                                textStyle: TextStyle(
+                                                    color: Colors.blueGrey,
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
+                                        ],
+                                      )),
+                            );
+                          },
+                        ),
+                      ]),
+                ],
+              ),
+            ),
+            SizedBox(height: height * 0.02),
+            Divider(thickness: 0.5),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
+              },
+              title: Row(children: [
+                SizedBox(width: width * 0.01),
                 Icon(FontAwesomeIcons.signOutAlt),
                 SizedBox(width: width * 0.06),
                 Text(
                   'Log Out',
                   style: GoogleFonts.poppins(
-                    textStyle: TextStyle(
-                      fontSize: 18,
-                      color: myColor,
-                    ),
+                    textStyle: TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Dashboard(),
-                ),
-              );
-            },
-          ),
-        ],
+              ]),
+            )
+          ],
+        ),
       ),
     );
   }
